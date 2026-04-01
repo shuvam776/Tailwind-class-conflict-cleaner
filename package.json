@@ -1,0 +1,17 @@
+{
+  "name": "tailwind-class-cleanershuvam",
+  "version": "0.1.0",
+  "type": "module",
+
+  "main": "babel/index.js",
+
+  "exports": {
+    "./eslint": "./eslint/index.js",
+    "./babel": "./babel/index.js"
+  },
+
+  "peerDependencies": {
+    "eslint": ">=8.0.0",
+    "@babel/core": "^7.0.0"
+  }
+}

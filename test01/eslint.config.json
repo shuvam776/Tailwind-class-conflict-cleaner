@@ -1,0 +1,6 @@
+{
+  "plugins": ["tailwind-cleaner"],
+  "rules": {
+    "tailwind-cleaner/no-conflicts": "warn"
+  }
+}

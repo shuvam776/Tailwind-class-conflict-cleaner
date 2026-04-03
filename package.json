@@ -3,12 +3,18 @@
   "version": "0.1.0",
   "type": "module",
 
-  "main": "babel/index.js",
+  "main": "eslint/index.js",
 
   "exports": {
-    "./eslint": "./eslint/index.js",
+    ".": "./eslint/index.js",
     "./babel": "./babel/index.js"
   },
+
+  "files": [
+    "eslint",
+    "babel",
+    "core"
+  ],
 
   "peerDependencies": {
     "eslint": ">=8.0.0",

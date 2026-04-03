@@ -1,73 +1,199 @@
-# React + TypeScript + Vite
+# Tailwind Class Cleaner
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Automatically detect and fix conflicting Tailwind CSS classes.
 
-Currently, two official plugins are available:
+Supports:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+* 🔍 **ESLint** → detect & auto-fix while coding
+* ⚡ **Babel** → optimize at build time
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 Installation
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install tailwind-class-cleaner
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
+
+# 🧠 What It Does
+
+Fixes conflicting Tailwind classes like:
+
+```jsx
+<div className="p-2 p-4 text-sm text-lg bg-red-500 bg-blue-500" />
+```
+
+➡️ Becomes:
+
+```jsx
+<div className="p-4 text-lg bg-blue-500" />
+```
+
+---
+
+# 🔍 ESLint Usage (Recommended)
+
+Works in modern setups like **Vite + TypeScript + ESLint v9 (flat config)**.
+
+---
+
+## 1. Setup ESLint Config
+
+Create or update `eslint.config.js`:
 
 ```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+import js from "@eslint/js";
+import tseslint from "typescript-eslint";
+import tailwindCleaner from "tailwind-class-cleaner";
 
-export default defineConfig([
-  globalIgnores(['dist']),
+export default [
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+
   {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
+    files: ["**/*.{js,jsx,ts,tsx}"],
+
+    plugins: {
+      "tailwind-cleaner": tailwindCleaner,
+    },
+
+    rules: {
+      "tailwind-cleaner/no-conflicts": "warn",
     },
   },
-])
+];
 ```
+
+---
+
+## 2. Run ESLint
+
+```bash
+npx eslint . --fix
+```
+
+---
+
+## 💡 Example (ESLint Fix)
+
+```tsx
+className="p-2 p-4 px-2 px-6 text-sm text-lg"
+```
+
+➡️ becomes:
+
+```tsx
+className="p-4 px-6 text-lg"
+```
+
+---
+
+# ⚡ Babel Usage (Build-Time Optimization)
+
+Use this if you want automatic cleanup during builds.
+
+---
+
+## 1. Install Babel (if not already)
+
+```bash
+npm install @babel/core @babel/cli @babel/preset-react
+```
+
+---
+
+## 2. Create Babel Config
+
+### `babel.config.json`
+
+```json
+{
+  "presets": ["@babel/preset-react"],
+  "plugins": ["tailwind-class-cleaner/babel"]
+}
+```
+
+---
+
+## 3. Run Babel
+
+```bash
+npx babel src --out-dir dist
+```
+
+---
+
+## 💡 Example (Babel Transform)
+
+```jsx
+className="p-2 p-4 text-sm text-lg"
+```
+
+➡️ becomes:
+
+```jsx
+className="p-4 text-lg"
+```
+
+---
+
+# 🧪 Template Literal Support
+
+Partially supported:
+
+```tsx
+className={`p-2 p-4 ${active ? "px-2 px-6" : ""}`}
+```
+
+➡️ becomes:
+
+```tsx
+className={`p-4 ${active ? "px-2 px-6" : ""}`}
+```
+
+✅ Static parts are optimized
+⚠️ Dynamic expressions are left untouched
+
+---
+
+# ⚠️ Limitations (v0.1)
+
+* Only supports:
+
+  * static class strings
+  * partial template literals
+
+* Does NOT yet support:
+
+  * `clsx()` / `classnames`
+  * conditional merging logic
+  * Tailwind variants (`md:`, `hover:`)
+  * Tailwind config awareness
+
+---
+
+# 🧠 Why This Instead of `tailwind-merge`?
+
+| Feature                 | tailwind-merge | tailwind-class-cleaner |
+| ----------------------- | -------------- | ---------------------- |
+| Runtime cost            | ❌ Yes          | ✅ No                   |
+| Auto fix in editor      | ❌ No           | ✅ Yes                  |
+| Build-time optimization | ❌ No           | ✅ Yes                  |
+| Requires wrapping code  | ❌ Yes          | ✅ No                   |
+
+---
+
+# 🛠 Roadmap
+
+* Support `clsx` / `classnames`
+* Handle variants (`md:`, `hover:`)
+* Tailwind config awareness
+* Vite plugin
+
+---
+
+# 📄 License
+
+MIT

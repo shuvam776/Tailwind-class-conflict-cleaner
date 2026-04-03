@@ -1,4 +1,4 @@
-import noConflicts from "./rules/no-conflicts.js";
+import noConflicts from "./rules/no-conflict.js";
 
 export default {
   rules: {

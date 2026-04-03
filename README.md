@@ -105,4 +105,4 @@ className="p-2 p-4"
 ## 📄 License
 
 MIT
-"# Tailwind-class-conflict-cleaner" 
+
